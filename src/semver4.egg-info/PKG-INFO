@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: semver4
+Version: 0.0.1b1
+Summary: Semantic versioning module enriched by hotfix version
+Author: Martin Mudroch
+Author-email: martin.mudroch@proton.me
+License: MIT
+Keywords: version,versioning,semantic,semver
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# Overview
+A python module to deal with modified semantic versioning.
