@@ -1,7 +1,12 @@
 from __future__ import annotations
 import re
+import operator
 from typing import Union, NewType, SupportsInt, Optional
-from semver4.errors import InvalidVersionPartError, InvalidVersionError
+from semver4.errors import (
+    InvalidVersionPartError,
+    InvalidVersionError,
+    NotComparableError
+)
 
 
 __version__ = '0.0.1-beta'
@@ -62,6 +67,14 @@ class Version:
     def fix(self) -> int:
         return self._versionparts['fix']
 
+    def _compare(self, obj: Version, op: 'operator', can_equal: bool) -> bool:
+        if not isinstance(obj, Version):
+            raise NotComparableError(f'Can not compare Version type and {type(obj)}')
+        for versionpart in ['major', 'minor', 'patch', 'fix']:
+            if self[versionpart] != obj[versionpart]:
+                return op(self[versionpart], obj[versionpart])
+        return can_equal
+
     def __iter__(self):
         for part, value in self._versionparts.items():
             yield part, value
@@ -69,7 +82,20 @@ class Version:
     def __getitem__(self, key):
         return self._versionparts[key]
 
-    # def __eq__(self, obj: Version) -> bool:
-    #     for versionpart in ['major', 'minor', 'patch', 'fix']:
-    #         if self[versionpart] == self
-    #         return
+    def __eq__(self, obj: Version) -> bool:
+        return self._compare(obj, operator.eq, can_equal=True)
+
+    def __ne__(self, obj: Version) -> bool:
+        return not self.__eq__(obj)
+
+    def __ge__(self, obj: Version) -> bool:
+        return self._compare(obj, operator.gt, can_equal=True)
+
+    def __le__(self, obj: Version) -> bool:
+        return self._compare(obj, operator.lt, can_equal=True)
+
+    def __gt__(self, obj: Version) -> bool:
+        return self._compare(obj, operator.gt, can_equal=False)
+
+    def __lt__(self, obj: Version) -> bool:
+        return self._compare(obj, operator.lt, can_equal=False)

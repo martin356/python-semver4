@@ -1,5 +1,8 @@
 import unittest
-from semver4.errors import InvalidVersionPartError, InvalidVersionError
+from semver4.errors import (
+    InvalidVersionPartError,
+    InvalidVersionError
+)
 from semver4 import Version
 
 
