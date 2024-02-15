@@ -9,7 +9,7 @@ from semver4.errors import (
 )
 
 
-__version__ = '0.0.1-beta'
+__version__ = '0.0.1-beta.2'
 
 
 class Version:
