@@ -16,11 +16,15 @@ class Version:
 
     _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
 
+    @classmethod
+    def valid_version_regex(cls):
+        return f
+
     @staticmethod
     def validate(version, raise_err=False):
         if re.fullmatch(Version._valid_version_regex, version) is None:
             if raise_err:
-                raise InvalidVersionError(f'Format of version ({version}) does not match x.y.z.f-prerelease+metadata')
+                raise InvalidVersionError(f'Format of version ({version}) does not match x.y.z.f-prerelease+buildmetadata')
             return False
         return True
 
@@ -41,25 +45,18 @@ class Version:
             if isinstance(version, Version):
                 versionparts = dict(version)
             elif isinstance(version, str):
-                Version.validate(version, raise_err=True)
-                versionparts, prerelease_build = version.split('-') if '-' in version else (version.split('.'), None)
-                if prerelease_build:
-                    versionparts = versionparts.split('.')
-                    prerelease, build = prerelease_build.split('+') if '+' in prerelease_build else (prerelease_build, None)
+                if (version := re.fullmatch(Version._valid_version_regex, version)) is None:
+                    raise InvalidVersionError(f'Format of version ({version}) does not match x.y.z.f-prerelease+buildmetadata')
                 versionparts = {
-                    'major': int(versionparts[0]),
-                    'minor': int(versionparts[1]),
-                    'patch': int(versionparts[2]),
-                    'fix': int(versionparts[3] if len(versionparts) == 4 else fix),
-                    'prerelease': prerelease,
-                    'build': build
+                    'major': int(version['major']),
+                    'minor': int(version['minor']),
+                    'patch': int(version['patch']),
+                    'fix': int(version['fix']) if version['fix'] else fix,
+                    'prerelease': version['prerelease'] if version['prerelease'] else prerelease,
+                    'build': version['buildmetadata'] if version['buildmetadata'] else build
                 }
-                if len(versionparts) == 3:
-                    versionparts.append(fix)
             else:
                 raise InvalidVersionError(f'version must be of type str or Version but is "{type(version)}"')
-        except ValueError:
-            raise InvalidVersionPartError('Version part must not be non-numeric string')
         except (InvalidVersionPartError, InvalidVersionError) as err:
             raise err
         else:

@@ -26,12 +26,12 @@ class VersionInitTestCase(unittest.TestCase):
         self.assertIsNone(version.build)
 
     def test_from_str_with_fix(self):
-        version = Version(version='4.2.0.9-alpha.9+989898')
+        version = Version(version='4.2.0.9-alpha-beta.9+989898')
         self.assertEqual(version.major, 4)
         self.assertEqual(version.minor, 2)
         self.assertEqual(version.patch, 0)
         self.assertEqual(version.fix, 9)
-        self.assertEqual(version.prerelease, 'alpha.9')
+        self.assertEqual(version.prerelease, 'alpha-beta.9')
         self.assertEqual(version.build, '989898')
 
     def test_from_str_without_fix(self):
