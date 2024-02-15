@@ -16,6 +16,14 @@ class Version:
 
     _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
 
+    @staticmethod
+    def validate(version, raise_err=False):
+        if re.fullmatch(Version._valid_version_regex, version) is None:
+            if raise_err:
+                raise InvalidVersionError(f'Format of version ({version}) does not match x.y.z.f-prerelease+metadata')
+            return False
+        return True
+
     def __init__(
         self,
         version: Union[str, Version] = None,
@@ -33,8 +41,7 @@ class Version:
             if isinstance(version, Version):
                 versionparts = dict(version)
             elif isinstance(version, str):
-                if re.fullmatch(self._valid_version_regex, version) is None:
-                    raise InvalidVersionError(f'Format of version ({version}) does not match x.y.z.f')
+                Version.validate(version, raise_err=True)
                 versionparts, prerelease_build = version.split('-') if '-' in version else (version.split('.'), None)
                 if prerelease_build:
                     versionparts = versionparts.split('.')
