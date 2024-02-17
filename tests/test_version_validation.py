@@ -2,10 +2,10 @@ import unittest
 from semver4.errors import (
     InvalidVersionError
 )
-from semver4 import Version
+from semver4 import Version4
 
 
-class VersionValidationTestCase(unittest.TestCase):
+class Version4ValidationTestCase(unittest.TestCase):
 
     def test_valid_versions(self):
         valid_versions = [
@@ -16,7 +16,7 @@ class VersionValidationTestCase(unittest.TestCase):
             '1.2.3.6-bla.9+b6', '1.2.3.6+b89'
         ]
         for version in valid_versions:
-            self.assertTrue(Version.validate(version))
+            self.assertTrue(Version4.validate(version))
 
     def test_invalid_versions(self):
         invalid_versions = [
@@ -25,5 +25,5 @@ class VersionValidationTestCase(unittest.TestCase):
             '1.2.3.4+', '1.2.3.4-bla+'
         ]
         for version in invalid_versions:
-            self.assertFalse(Version.validate(version))
-            self.assertRaises(InvalidVersionError, Version.validate, version, raise_err=True)
+            self.assertFalse(Version4.validate(version))
+            self.assertRaises(InvalidVersionError, Version4.validate, version, raise_err=True)
