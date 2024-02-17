@@ -3,7 +3,7 @@ from semver4.errors import (
     FixPartNotSupported,
     InvalidVersionError
 )
-from semver4 import Version4, SemVersion
+from semver4 import Version4, SemVersion, BaseVersion
 
 
 class Version4InitTestCase(unittest.TestCase):
@@ -83,6 +83,16 @@ class Version4InitTestCase(unittest.TestCase):
         self.assertEqual('alpha', version['prerelease'])
         self.assertEqual('56', version['build'])
 
+    def test_to_string(self):
+        self.assertEqual('1.2.3', Version4('1.2.3.0').version)
+        versions = ['1.2.3', '1.2.3-pre', '1.2.3-pre+build', '1.2.3.4', '1.2.3.4-pre', '1.2.3.4-pre+build']
+        for v in versions:
+            self.assertEqual(v, Version4(v).version)
+            self.assertEqual(v, str(Version4(v)))
+
+    def test_repr(self):
+        self.assertEqual('type Version4|2.3.6.9', Version4('2.3.6.9').__repr__())
+
 
 class StandardVersionInitTestCase(unittest.TestCase):
 
@@ -108,3 +118,11 @@ class StandardVersionInitTestCase(unittest.TestCase):
         self.assertRaises(KeyError, lambda: version['fix'])
         self.assertEqual('alpha', version['prerelease'])
         self.assertEqual('56', version['build'])
+
+    def test_to_string(self):
+        for v in ['1.2.3', '1.2.3-pre', '1.2.3-pre+build']:
+            self.assertEqual(v, SemVersion(v).version)
+            self.assertEqual(v, str(SemVersion(v)))
+
+    def test_repr(self):
+        self.assertEqual('type SemVersion|2.3.9', SemVersion('2.3.9').__repr__())

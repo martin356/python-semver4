@@ -34,10 +34,10 @@ class BaseVersion:
     ):
         try:
             if version is None:
-                if fix is None:
-                    version = f'{major}.{minor}.{patch}{"-"+prerelease if prerelease else ""}{"+"+build if build else ""}'
-                else:
-                    version = f'{major}.{minor}.{patch}.{fix}{"-"+prerelease if prerelease else ""}{"+"+build if build else ""}'
+                version = self._build_version(
+                    major=major, minor=minor, patch=patch, fix=fix,
+                    prerelease=prerelease, build=build
+                )
 
             if isinstance(version, BaseVersion):
                 versionparts = dict(version)
@@ -82,6 +82,10 @@ class BaseVersion:
     @property
     def build(self) -> int:
         return self._versionparts['build']
+
+    @property
+    def version(self) -> str:
+        return self._build_version(**self._versionparts)
 
     def _inc_dec_version_part(self, part: str, op: 'operator') -> BaseVersion:
         self._versionparts[part] = op(self._versionparts[part], 1)
@@ -131,6 +135,12 @@ class BaseVersion:
             if self[versionpart] != obj[versionpart]:
                 return op(self[versionpart], obj[versionpart])
         return can_equal
+
+    def __str__(self):
+        return self.version
+
+    def __repr__(self):
+        return f'type {self.__class__.__name__}|{self.version}'
 
     def __iter__(self):
         for part, value in self._versionparts.items():

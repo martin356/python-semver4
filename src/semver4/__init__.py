@@ -10,6 +10,10 @@ class Version4(BaseVersion):
 
     _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
 
+    def _build_version(self, **parts):
+        ma, mi, pa, fx, pre, bl = parts['major'], parts['minor'], parts['patch'], parts['fix'], parts['prerelease'], parts['build']
+        return f'{ma}.{mi}.{pa}{f".{fx}" if fx else ""}{f"-{pre}" if pre else ""}{f"+{bl}" if bl else ""}'
+
 
 class SemVersion(BaseVersion):
 
@@ -29,6 +33,10 @@ class SemVersion(BaseVersion):
     @property
     def fix(self) -> int:
         raise FixPartNotSupported('This class supports standard semantic version format 2.0')
+
+    def _build_version(self, **parts):
+        ma, mi, pa, pre, build = parts['major'], parts['minor'], parts['patch'], parts['prerelease'], parts['build']
+        return f'{ma}.{mi}.{pa}{f"-{pre}" if pre else ""}{f"+{build}" if build else ""}'
 
 
 Version = Version4
