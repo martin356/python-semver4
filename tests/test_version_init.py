@@ -1,9 +1,9 @@
 import unittest
 from semver4.errors import (
-    InvalidVersionPartError,
+    FixPartNotSupported,
     InvalidVersionError
 )
-from semver4 import Version4
+from semver4 import Version4, SemVersion
 
 
 class Version4InitTestCase(unittest.TestCase):
@@ -80,5 +80,31 @@ class Version4InitTestCase(unittest.TestCase):
         self.assertEqual(2, version['minor'])
         self.assertEqual(0, version['patch'])
         self.assertEqual(7, version['fix'])
+        self.assertEqual('alpha', version['prerelease'])
+        self.assertEqual('56', version['build'])
+
+
+class StandardVersionInitTestCase(unittest.TestCase):
+
+    def test_init(self):
+        version = SemVersion('4.2.0-alpha-beta.9+989898')
+        self.assertEqual(version.major, 4)
+        self.assertEqual(version.minor, 2)
+        self.assertEqual(version.patch, 0)
+        self.assertRaises(FixPartNotSupported, lambda: version.fix)
+        self.assertEqual(version.prerelease, 'alpha-beta.9')
+        self.assertEqual(version.build, '989898')
+        self.assertFalse('fix' in version._versionparts)
+
+    def test_iterator(self):
+        version = SemVersion(major=4, minor='2', patch='0', prerelease='alpha', build='123')
+        self.assertEqual({'major': 4, 'minor': 2, 'patch': 0, 'prerelease': 'alpha', 'build': '123'}, dict(version))
+
+    def test_get_item(self):
+        version = SemVersion('4.2.0-alpha+56')
+        self.assertEqual(4, version['major'])
+        self.assertEqual(2, version['minor'])
+        self.assertEqual(0, version['patch'])
+        self.assertRaises(KeyError, lambda: version['fix'])
         self.assertEqual('alpha', version['prerelease'])
         self.assertEqual('56', version['build'])

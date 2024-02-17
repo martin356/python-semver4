@@ -11,8 +11,6 @@ from semver4.errors import (
 
 class BaseVersion:
 
-    # _valid_version_with_fix_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
-    # _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
     _valid_version_regex = None
 
     @classmethod
@@ -35,7 +33,10 @@ class BaseVersion:
     ):
         try:
             if version is None:
-                version = f'{major}.{minor}.{patch}.{fix}{"-"+prerelease if prerelease else ""}{"+"+build if build else ""}'
+                if fix is None:
+                    version = f'{major}.{minor}.{patch}{"-"+prerelease if prerelease else ""}{"+"+build if build else ""}'
+                else:
+                    version = f'{major}.{minor}.{patch}.{fix}{"-"+prerelease if prerelease else ""}{"+"+build if build else ""}'
 
             if isinstance(version, BaseVersion):
                 versionparts = dict(version)
@@ -45,10 +46,11 @@ class BaseVersion:
                     'major': int(version['major']),
                     'minor': int(version['minor']),
                     'patch': int(version['patch']),
-                    'fix': int(version['fix']) if version['fix'] else fix,
                     'prerelease': version['prerelease'] if version['prerelease'] else prerelease,
                     'build': version['buildmetadata'] if version['buildmetadata'] else build
                 }
+                if fix is not None:
+                    versionparts['fix'] = int(version['fix']) if version['fix'] else fix
             else:
                 raise InvalidVersionError(f'version must be of type str or Version but is "{type(version)}"')
         except (InvalidVersionPartError, InvalidVersionError) as err:
