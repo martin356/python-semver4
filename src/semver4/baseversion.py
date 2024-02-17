@@ -84,34 +84,40 @@ class BaseVersion:
         return self._versionparts['build']
 
     def _inc_dec_version_part(self, part: str, op: 'operator') -> BaseVersion:
-        if op is operator.sub and self[part] == 0:
-            raise DecreaseVersionError(f'Can not decrease {part} version. It is already 0')
         self._versionparts[part] = op(self._versionparts[part], 1)
         return self
 
+    def inc(self, part: str) -> BaseVersion:
+        return self._inc_dec_version_part(part, operator.add)
+
+    def dec(self, part: str) -> BaseVersion:
+        if self[part] == 0:
+            raise DecreaseVersionError(f'Can not decrease {part} version. It is already 0')
+        return self._inc_dec_version_part(part, operator.sub)
+
     def inc_major(self) -> BaseVersion:
-        return self._inc_dec_version_part('major', operator.add)
+        return self.inc('major')
 
     def inc_minor(self) -> BaseVersion:
-        return self._inc_dec_version_part('minor', operator.add)
+        return self.inc('minor')
 
     def inc_patch(self) -> BaseVersion:
-        return self._inc_dec_version_part('patch', operator.add)
+        return self.inc('patch')
 
     def inc_fix(self) -> BaseVersion:
-        return self._inc_dec_version_part('fix', operator.add)
+        return self.inc('fix')
 
     def dec_major(self) -> BaseVersion:
-        return self._inc_dec_version_part('major', operator.sub)
+        return self.dec('major')
 
     def dec_minor(self) -> BaseVersion:
-        return self._inc_dec_version_part('minor', operator.sub)
+        return self.dec('minor')
 
     def dec_patch(self) -> BaseVersion:
-        return self._inc_dec_version_part('patch', operator.sub)
+        return self.dec('patch')
 
     def dec_fix(self) -> BaseVersion:
-        return self._inc_dec_version_part('fix', operator.sub)
+        return self.dec('fix')
 
     def _parse_str_version(self, version):
         if (version := re.fullmatch(self._valid_version_regex, version)) is None:
