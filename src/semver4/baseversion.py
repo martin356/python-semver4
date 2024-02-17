@@ -5,7 +5,8 @@ from typing import Union, SupportsInt, Optional
 from semver4.errors import (
     InvalidVersionPartError,
     InvalidVersionError,
-    NotComparableError
+    NotComparableError,
+    DecreaseVersionError
 )
 
 
@@ -81,6 +82,36 @@ class BaseVersion:
     @property
     def build(self) -> int:
         return self._versionparts['build']
+
+    def _inc_dec_version_part(self, part: str, op: 'operator') -> BaseVersion:
+        if op is operator.sub and self[part] == 0:
+            raise DecreaseVersionError(f'Can not decrease {part} version. It is already 0')
+        self._versionparts[part] = op(self._versionparts[part], 1)
+        return self
+
+    def inc_major(self) -> BaseVersion:
+        return self._inc_dec_version_part('major', operator.add)
+
+    def inc_minor(self) -> BaseVersion:
+        return self._inc_dec_version_part('minor', operator.add)
+
+    def inc_patch(self) -> BaseVersion:
+        return self._inc_dec_version_part('patch', operator.add)
+
+    def inc_fix(self) -> BaseVersion:
+        return self._inc_dec_version_part('fix', operator.add)
+
+    def dec_major(self) -> BaseVersion:
+        return self._inc_dec_version_part('major', operator.sub)
+
+    def dec_minor(self) -> BaseVersion:
+        return self._inc_dec_version_part('minor', operator.sub)
+
+    def dec_patch(self) -> BaseVersion:
+        return self._inc_dec_version_part('patch', operator.sub)
+
+    def dec_fix(self) -> BaseVersion:
+        return self._inc_dec_version_part('fix', operator.sub)
 
     def _parse_str_version(self, version):
         if (version := re.fullmatch(self._valid_version_regex, version)) is None:
