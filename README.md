@@ -1,6 +1,7 @@
 ## Overview
 A python module to deal with modified semantic versioning.
 
+### Motivation
 There are three numbers as main part of a version in semantic version ([semver.org](https://semver.org)). Third number, patch, is defined as:
 > PATCH version when you make backward compatible bug fixes
 
@@ -13,6 +14,7 @@ The first type is released in a standard release process and at the end the patc
 The second one is the case we identified a bug which has to be fixed and released immidiately. In this case, a version witch increased patch can potentially already exists as any sort of pre-release version.
 <br>Let's assume there is version *0.4.2* deployed in production. Versions *0.4.3-rc* and *0.4.4-rc* already exist in our non prod environment but they are not ready to be released. The question is what version should have fixed code. If we want to increase patch we would have to jump to *0.4.5* which may (and will) brings confusion in the versioning.
 
+### Fix version part
 To solve to the scenario described above, we introduce 4th number to main version part. Let's call it fix version and define it as:
 > FIX version when you make hot fixes released immidiately
 
