@@ -131,7 +131,7 @@ class BaseVersion:
     def _compare(self, obj: BaseVersion, op: 'operator', can_equal: bool) -> bool:
         if not isinstance(obj, BaseVersion):
             raise NotComparableError(f'Can not compare Version type and {type(obj)}')
-        for versionpart in ['major', 'minor', 'patch', 'fix']:
+        for versionpart in self._versionparts:
             if self[versionpart] != obj[versionpart]:
                 return op(self[versionpart], obj[versionpart])
         return can_equal

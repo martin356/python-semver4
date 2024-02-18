@@ -1,6 +1,6 @@
 import unittest
 from semver4.errors import NotComparableError
-from semver4 import BaseVersion
+from semver4 import BaseVersion, SemVersion, Version4
 
 
 class BaseVersionCompareTestCase(unittest.TestCase):
@@ -65,3 +65,15 @@ class BaseVersionCompareTestCase(unittest.TestCase):
         self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') <= 'bla')
         self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') > 'bla')
         self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') < 'bla')
+
+
+class SemVersionComparisonTestCase(unittest.TestCase):
+
+    def test_semversion_comparison(self):
+        self.assertTrue(SemVersion('1.2.3') > SemVersion('0.7.8'))
+        self.assertFalse(SemVersion('1.2.3') < SemVersion('0.7.8'))
+        self.assertTrue(SemVersion('1.2.3') >= SemVersion('1.2.3'))
+
+    def test_semversion_comparison(self):
+        self.assertTrue(SemVersion('1.2.3') > Version4('0.7.8.9'))
+        self.assertTrue(SemVersion('1.2.3-beta') == Version4('1.2.3.0-beta'))
