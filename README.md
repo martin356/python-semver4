@@ -24,6 +24,7 @@ At the end, the modification means only the one number.
 ```python
 from semver4 import Version
 
+
 version = Version(major=2, minor=4, path=4, prerelease='beta')
 print(version)
 # '2.4.4-beta'
