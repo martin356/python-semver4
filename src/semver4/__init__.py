@@ -1,48 +1,42 @@
-from __future__ import annotations
-from typing import Union, NewType, SupportsInt, Optional
-import semver4.errors as errors
+from typing import SupportsInt
+from semver4.baseversion import BaseVersion
+from semver4.errors import FixPartNotSupported
 
 
-class Version:
+__version__ = '0.0.1-beta.3'
+
+
+class Version4(BaseVersion):
+
+    _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
+
+    def _build_version(self, **parts):
+        ma, mi, pa, fx, pre, bl = parts['major'], parts['minor'], parts['patch'], parts['fix'], parts['prerelease'], parts['build']
+        return f'{ma}.{mi}.{pa}{f".{fx}" if fx else ""}{f"-{pre}" if pre else ""}{f"+{bl}" if bl else ""}'
+
+
+class SemVersion(BaseVersion):
+
+    _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
 
     def __init__(
-        self,
-        version: Union[str, Version] = None,
-        major: Union[str, SupportsInt] = None,
-        minor: Union[str, SupportsInt] = None,
-        patch: Union[str, SupportsInt] = None,
-        fix: Optional[Union[str, SupportsInt]] = 0
+            self,
+            version: str | BaseVersion = None,
+            major: str | SupportsInt = None,
+            minor: str | SupportsInt = None,
+            patch: str | SupportsInt = None,
+            prerelease: str | SupportsInt | None = None,
+            build: str | SupportsInt | None = None
     ):
-        if version:
-            versionparts = tuple(version)
-        else:
-            try:
-                for vp in (versionparts := (int(major), int(minor), int(patch), int(fix))):
-                    if vp < 0:
-                        raise errors.WrongVersionPart('Version part must be positive integer or zero')
-            except ValueError:
-                raise errors.WrongVersionPart('Version part must not be non-numeric string')
-            except errors.WrongVersionPart as err:
-                raise err
-
-        self._major, self._minor, self._patch, self._fix = versionparts
-
-    def __iter__(self):
-        for part in [self.major, self.minor, self.patch, self.fix]:
-            yield part
-
-    @property
-    def major(self) -> int:
-        return self._major
-
-    @property
-    def minor(self) -> int:
-        return self._minor
-
-    @property
-    def patch(self) -> int:
-        return self._patch
+        super().__init__(version, major, minor, patch, None, prerelease, build)
 
     @property
     def fix(self) -> int:
-        return self._fix
+        raise FixPartNotSupported('This class supports standard semantic version format 2.0')
+
+    def _build_version(self, **parts):
+        ma, mi, pa, pre, build = parts['major'], parts['minor'], parts['patch'], parts['prerelease'], parts['build']
+        return f'{ma}.{mi}.{pa}{f"-{pre}" if pre else ""}{f"+{build}" if build else ""}'
+
+
+Version = Version4
