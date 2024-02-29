@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import SupportsInt
 from semver4.baseversion import BaseVersion
 from semver4.errors import FixPartNotSupported
