@@ -4,7 +4,7 @@ from semver4.baseversion import BaseVersion
 from semver4.errors import FixPartNotSupported
 
 
-__version__ = '0.0.1-beta.3'
+__version__ = '0.0.1-beta.4'
 
 
 class Version4(BaseVersion):
