@@ -30,16 +30,20 @@ from semver4 import Version
 version = Version(major=2, minor=4, path=4, prerelease='beta')
 print(version)
 # '2.4.4-beta'
+print(version.minor)
+# 4
 
 version > Version('0.4.2.4')
 # True
 
 version.inc_fix()
-print(version.fix)
+print(version)
 # '2.4.4.1-beta'
+print(version.fix)
+# 1
 
 version.inc_minor().inc_major().dec_patch()
-print(version.fix)
+print(version)
 # '3.5.3.1-beta'
 ```
 
