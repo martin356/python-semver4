@@ -9,7 +9,7 @@ import importlib
 if __name__ == '__main__':
     excludes = []
 
-    is_test_case = lambda v: isinstance(v, type) and issubclass(v, unittest.TestCase)
+    is_test_case = lambda v: isinstance(v, type) and issubclass(v, unittest.TestCase) and not v.__name__.startswith('Base')
 
     py_items = pathlib.Path(__file__).resolve().parent.glob('test_*.py')
     testmodules = [importlib.import_module(str(i.stem)) for i in py_items if i.is_file()]

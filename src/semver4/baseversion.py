@@ -15,6 +15,16 @@ class BaseVersion:
     _valid_version_regex = None
 
     @classmethod
+    def json_encode_function(cls, obj):
+        if isinstance(obj, cls):
+            return obj.version
+        raise TypeError(f'Object {obj.__class__} is not json serialisable')
+
+    @classmethod
+    def json_decode_function(cls, dct):
+        return {k: cls(v) if isinstance(v, str) and cls.validate(v) else v for k, v in dct.items()}
+
+    @classmethod
     def validate(cls, version, raise_err=False):
         if re.fullmatch(cls._valid_version_regex, version) is None:
             if raise_err:
