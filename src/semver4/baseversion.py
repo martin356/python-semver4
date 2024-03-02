@@ -16,6 +16,10 @@ class BaseVersion:
     _valid_prerelease_regex = '(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)'
     _valid_build_regex = '(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)'
 
+    @staticmethod
+    def version_yaml_representer(dumper: 'yaml.SafeDumper', version: BaseVersion) -> 'yaml.nodes.MappingNode':
+        return str(version)
+
     @classmethod
     def json_encode_function(cls, obj):
         if isinstance(obj, cls):
@@ -172,7 +176,7 @@ class BaseVersion:
     def dec_fix(self) -> BaseVersion:
         return self.dec('fix')
 
-    def _parse_str_version(self, version):
+    def _parse_str_version(self, version: str) -> re.Match[str] | None:
         if (matched := re.fullmatch(self.get_valid_version_regex(), version)) is None:
             raise InvalidVersionError(f'Format of version ({version}) does not match x.y.z.f-prerelease+buildmetadata')
         return matched
