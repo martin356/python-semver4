@@ -1,17 +1,12 @@
-import unittest
 from semver4.errors import (
     FixPartNotSupported,
-    InvalidVersionPartError,
     InvalidVersionError
 )
-from semver4 import Version4, SemVersion, BaseVersion
+from basetestcase import BaseTestCase
+from semver4 import Version4, SemVersion
 
 
-class BaseInitTestCase(unittest.TestCase):
-
-    def assert_for_version4(self, assertfnc):
-        if self.versioncls is Version4:
-            assertfnc()
+class BaseInitTestCase(BaseTestCase):
 
     def test_from_version_type(self):
         from_version = self.versioncls(major=4, minor=2, patch=0)
@@ -56,42 +51,6 @@ class BaseInitTestCase(unittest.TestCase):
         self.assert_for_version4(lambda: self.assertEqual(0, version['fix']))
         self.assertEqual('alpha', version['prerelease'])
         self.assertEqual('56', version['build'])
-
-    def test_set_prerelease(self):
-        version = self.versioncls('4.2.0-alpha+56')
-        version.prerelease = 'beta'
-        self.assertEqual('beta', version.prerelease)
-        version['prerelease'] = 'gama'
-        self.assertEqual('gama', version.prerelease)
-
-    def test_set_buildmetadata(self):
-        version = self.versioncls('4.2.0-alpha+56')
-        version.metadata = '123'
-        self.assertEqual('123', version.metadata)
-        self.assertEqual('123', version.build)
-        version.build = '456'
-        self.assertEqual('456', version.metadata)
-        self.assertEqual('456', version.build)
-        version['metadata'] = '789'
-        self.assertEqual('789', version.metadata)
-        self.assertEqual('789', version.build)
-        version['build'] = '1011'
-        self.assertEqual('1011', version.metadata)
-        self.assertEqual('1011', version.build)
-
-    def test_set_buildmetadata_invalid_value(self):
-        version = self.versioncls('4.2.0-alpha+56')
-        for invalid_char in '\/*_()[]{}"?!\'+':
-            with self.assertRaises(InvalidVersionPartError):
-                version.build = f'5{invalid_char}99'
-            with self.assertRaises(InvalidVersionPartError):
-                version.metadata = f'5{invalid_char}99'
-
-    def test_set_prerelease_invalid_value(self):
-        version = self.versioncls('4.2.0-alpha+56')
-        for invalid_char in '\/*_()[]{}"?!\'+':
-            with self.assertRaises(InvalidVersionPartError):
-                version.prerelease = f'5{invalid_char}99'
 
 
 class Version4InitTestCase(BaseInitTestCase):
