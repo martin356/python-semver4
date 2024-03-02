@@ -16,10 +16,6 @@ class BaseVersion:
     _valid_prerelease_regex = '(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)'
     _valid_build_regex = '(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)'
 
-    @staticmethod
-    def version_yaml_representer(dumper: 'yaml.SafeDumper', version: BaseVersion) -> 'yaml.nodes.MappingNode':
-        return str(version)
-
     @classmethod
     def json_encode_function(cls, obj):
         if isinstance(obj, cls):
