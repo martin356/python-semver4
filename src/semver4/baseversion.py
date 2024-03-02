@@ -185,7 +185,7 @@ class BaseVersion:
         if not isinstance(obj, BaseVersion):
             raise NotComparableError(f'Can not compare Version type and {type(obj)}')
         for versionpart in self._versionparts:
-            if self[versionpart] != obj[versionpart]:
+            if versionpart != 'build' and self[versionpart] != obj[versionpart]:
                 return op(self[versionpart], obj[versionpart])
         return can_equal
 

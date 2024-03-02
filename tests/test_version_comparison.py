@@ -5,69 +5,86 @@ from semver4 import BaseVersion, SemVersion, Version4
 
 class BaseVersionCompareTestCase(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        BaseVersion._valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
+    def test_not_version_obj(self):
+        self.assertRaises(NotComparableError, lambda: self.versioncls('1.2.3') == 'bla')
+        self.assertRaises(NotComparableError, lambda: self.versioncls('1.2.3') != 'bla')
+        self.assertRaises(NotComparableError, lambda: self.versioncls('1.2.3') >= 'bla')
+        self.assertRaises(NotComparableError, lambda: self.versioncls('1.2.3') <= 'bla')
+        self.assertRaises(NotComparableError, lambda: self.versioncls('1.2.3') > 'bla')
+        self.assertRaises(NotComparableError, lambda: self.versioncls('1.2.3') < 'bla')
+
+    def test_compare_prerelease(self):
+        self.assertTrue(self.versioncls('1.2.3-beta') > self.versioncls('1.2.3-alpha'))
+        self.assertTrue(self.versioncls('1.2.3-alpha.5') > self.versioncls('1.2.3-alpha.48'))
+        self.assertTrue(self.versioncls('1.2.3-alpha.5') >= self.versioncls('1.2.3-alpha.5'))
+        self.assertFalse(self.versioncls('1.2.3-beta') < self.versioncls('1.2.3-alpha'))
+        self.assertFalse(self.versioncls('1.2.3-alpha.5') < self.versioncls('1.2.3-alpha.48'))
+        self.assertFalse(self.versioncls('1.2.3-alpha.5') <= self.versioncls('1.2.3-alpha.48'))
+        self.assertTrue(self.versioncls('1.2.3-alpha.5') == self.versioncls('1.2.3-alpha.5'))
+        self.assertFalse(self.versioncls('1.2.3-alpha.5') != self.versioncls('1.2.3-alpha.5'))
+
+    def test_dont_compare_buildmetadata(self):
+        self.assertTrue(self.versioncls('1.2.3-alpha.5+1') == self.versioncls('1.2.3-alpha.5+9'))
+        self.assertFalse(self.versioncls('1.2.3-alpha.5+1') != self.versioncls('1.2.3-alpha.5+9'))
+
+
+class Version4ComparisonTestCase(BaseVersionCompareTestCase):
+
+    versioncls = Version4
 
     def test_greater_than(self):
-        self.assertTrue(BaseVersion('1.2.3.4') > BaseVersion('0.7.8.9'))
-        self.assertTrue(BaseVersion('1.2.3.4') > BaseVersion('1.1.8.9'))
-        self.assertTrue(BaseVersion('1.2.3.4') > BaseVersion('1.2.2.9'))
-        self.assertTrue(BaseVersion('1.2.3.4') > BaseVersion('1.2.3.2'))
-        self.assertTrue(BaseVersion('1.2.3.4') > BaseVersion('1.2.3'))
+        self.assertTrue(Version4('1.2.3.4') > Version4('0.7.8.9'))
+        self.assertTrue(Version4('1.2.3.4') > Version4('1.1.8.9'))
+        self.assertTrue(Version4('1.2.3.4') > Version4('1.2.2.9'))
+        self.assertTrue(Version4('1.2.3.4') > Version4('1.2.3.2'))
+        self.assertTrue(Version4('1.2.3.4') > Version4('1.2.3'))
 
-        self.assertFalse(BaseVersion('0.7.8.9') > BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.1.8.9') > BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.2.9') > BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.2') > BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') > BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') > BaseVersion('1.2.4'))
+        self.assertFalse(Version4('0.7.8.9') > Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.1.8.9') > Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.2.2.9') > Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.2.3.2') > Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.2.3.4') > Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.2.3.4') > Version4('1.2.4'))
 
     def test_lower_than(self):
-        self.assertTrue(BaseVersion('0.7.8.9') < BaseVersion('1.2.3.4'))
-        self.assertTrue(BaseVersion('1.1.8.9') < BaseVersion('1.2.3.4'))
-        self.assertTrue(BaseVersion('1.2.2.9') < BaseVersion('1.2.3.4'))
-        self.assertTrue(BaseVersion('1.2.3.2') < BaseVersion('1.2.3.4'))
-        self.assertTrue(BaseVersion('1.2.3') < BaseVersion('1.2.3.4'))
+        self.assertTrue(Version4('0.7.8.9') < Version4('1.2.3.4'))
+        self.assertTrue(Version4('1.1.8.9') < Version4('1.2.3.4'))
+        self.assertTrue(Version4('1.2.2.9') < Version4('1.2.3.4'))
+        self.assertTrue(Version4('1.2.3.2') < Version4('1.2.3.4'))
+        self.assertTrue(Version4('1.2.3') < Version4('1.2.3.4'))
 
-        self.assertFalse(BaseVersion('1.2.3.4') < BaseVersion('0.7.8.9'))
-        self.assertFalse(BaseVersion('1.2.3.4') < BaseVersion('1.1.8.9'))
-        self.assertFalse(BaseVersion('1.2.3.4') < BaseVersion('1.2.2.9'))
-        self.assertFalse(BaseVersion('1.2.3.4') < BaseVersion('1.2.3.2'))
-        self.assertFalse(BaseVersion('1.2.3.4') < BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') < BaseVersion('1.2.3'))
+        self.assertFalse(Version4('1.2.3.4') < Version4('0.7.8.9'))
+        self.assertFalse(Version4('1.2.3.4') < Version4('1.1.8.9'))
+        self.assertFalse(Version4('1.2.3.4') < Version4('1.2.2.9'))
+        self.assertFalse(Version4('1.2.3.4') < Version4('1.2.3.2'))
+        self.assertFalse(Version4('1.2.3.4') < Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.2.3.4') < Version4('1.2.3'))
 
     def test_equal(self):
-        self.assertTrue(BaseVersion('1.2.3.4') == BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') == BaseVersion('1.2.3.0'))
-        self.assertFalse(BaseVersion('1.2.3.4') == BaseVersion('1.2.0.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') == BaseVersion('1.0.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') == BaseVersion('0.2.3.4'))
-        self.assertTrue(BaseVersion('1.2.3') == BaseVersion('1.2.3.0'))
-        self.assertTrue(BaseVersion('1.2.3.2') <= BaseVersion('1.2.3.4'))
-        self.assertTrue(BaseVersion('1.2.3.4') >= BaseVersion('1.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') <= BaseVersion('1.2.3.2'))
-        self.assertFalse(BaseVersion('1.2.3.4') >= BaseVersion('1.2.3.5'))
-        self.assertTrue(BaseVersion('1.2.3') >= BaseVersion('1.2.3.0'))
-        self.assertTrue(BaseVersion('1.2.3') <= BaseVersion('1.2.3.0'))
+        self.assertTrue(Version4('1.2.3.4') == Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.2.3.4') == Version4('1.2.3.0'))
+        self.assertFalse(Version4('1.2.3.4') == Version4('1.2.0.4'))
+        self.assertFalse(Version4('1.2.3.4') == Version4('1.0.3.4'))
+        self.assertFalse(Version4('1.2.3.4') == Version4('0.2.3.4'))
+        self.assertTrue(Version4('1.2.3') == Version4('1.2.3.0'))
+        self.assertTrue(Version4('1.2.3.2') <= Version4('1.2.3.4'))
+        self.assertTrue(Version4('1.2.3.4') >= Version4('1.2.3.4'))
+        self.assertFalse(Version4('1.2.3.4') <= Version4('1.2.3.2'))
+        self.assertFalse(Version4('1.2.3.4') >= Version4('1.2.3.5'))
+        self.assertTrue(Version4('1.2.3') >= Version4('1.2.3.0'))
+        self.assertTrue(Version4('1.2.3') <= Version4('1.2.3.0'))
 
     def test_not_equal(self):
-        self.assertTrue(BaseVersion('1.2.3.4') != BaseVersion('1.2.3.0'))
-        self.assertTrue(BaseVersion('1.2.3.4') != BaseVersion('1.2.0.4'))
-        self.assertTrue(BaseVersion('1.2.3.4') != BaseVersion('1.0.3.4'))
-        self.assertTrue(BaseVersion('1.2.3.4') != BaseVersion('0.2.3.4'))
-        self.assertFalse(BaseVersion('1.2.3.4') != BaseVersion('1.2.3.4'))
-
-    def test_not_version_obj(self):
-        self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') == 'bla')
-        self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') != 'bla')
-        self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') >= 'bla')
-        self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') <= 'bla')
-        self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') > 'bla')
-        self.assertRaises(NotComparableError, lambda: BaseVersion('1.2.3') < 'bla')
+        self.assertTrue(Version4('1.2.3.4') != Version4('1.2.3.0'))
+        self.assertTrue(Version4('1.2.3.4') != Version4('1.2.0.4'))
+        self.assertTrue(Version4('1.2.3.4') != Version4('1.0.3.4'))
+        self.assertTrue(Version4('1.2.3.4') != Version4('0.2.3.4'))
+        self.assertFalse(Version4('1.2.3.4') != Version4('1.2.3.4'))
 
 
-class SemVersionComparisonTestCase(unittest.TestCase):
+class SemVersionComparisonTestCase(BaseVersionCompareTestCase):
+
+    versioncls = SemVersion
 
     def test_semversion_comparison(self):
         self.assertTrue(SemVersion('1.2.3') > SemVersion('0.7.8'))
