@@ -63,3 +63,15 @@ class SemVersionSerialisation(BaseVersionSerialisation):
     versioncls = SemVersion
     yaml_dumper = property(lambda _: semver4.yaml.get_semversion_dumper())
     yaml_loader = property(lambda _: semver4.yaml.get_semversion_loader())
+
+    def test_json_decode_classic_semver_only(self):
+        json_to_load = self.get_data()
+        json_to_load['version'] = '0.4.2'
+        json_to_load['version4'] = '0.4.2.1'
+        json_to_load = json.dumps(json_to_load)
+
+        result = json.loads(json_to_load, object_hook=self.versioncls.json_decode_function)
+        expected = self.get_data()
+        expected['version4'] = '0.4.2.1'
+
+        self.assertEqual(result, expected)
