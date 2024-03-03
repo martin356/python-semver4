@@ -20,10 +20,12 @@ To solve to the scenario described above, we introduce 4th number to main versio
 
 So the new version in the described scenario would be *0.4.2.1*
 
-At the end, the modification means only the one number.
+At the end, the modification is only the one number.
 
 ## Usage
-Few samples how to use the module.
+Few samples how to use the module. There are tow classes:
+- *Version4*: this class parses a version which includes the fix part as described above
+- *SemVersion*: classis semver2.0 version parser
 
 ```python
 from semver4 import Version
@@ -47,6 +49,9 @@ print(version.fix)
 version.inc_minor().inc_major().dec_patch()
 print(version)
 # '3.5.3.1-beta'
+
+# classic semver2.0 parser
+v = SemVersion('1.2.3')
 ```
 
 Both, Version4 and SemVersion objects now support json serialization and yaml serialization.
