@@ -20,20 +20,24 @@ To solve to the scenario described above, we introduce 4th number to main versio
 
 So the new version in the described scenario would be *0.4.2.1*
 
-At the end, the modification means only the one number.
+At the end, the modification is only the one number.
 
 ## Usage
+Few samples how to use the module. There are tow classes:
+- *Version4*: this class parses a version which includes the fix part as described above
+- *SemVersion*: classis semver2.0 version parser
+
 ```python
 from semver4 import Version
 
 
-version = Version(major=2, minor=4, path=4, prerelease='beta')
+version = Version(major=2, minor=4, patch=4, prerelease='beta')
 print(version)
 # '2.4.4-beta'
 print(version.minor)
 # 4
 
-version > Version('0.4.2.4')
+print(version > Version('0.4.2.4'))
 # True
 
 version.inc_fix()
@@ -45,8 +49,40 @@ print(version.fix)
 version.inc_minor().inc_major().dec_patch()
 print(version)
 # '3.5.3.1-beta'
+
+# classic semver2.0 parser
+v = SemVersion('1.2.3')
 ```
 
-## Known limitations
-- Comparing of two Versions only by major, minor, patch and fix. Prerelease and build do not affect any comparison operation.
-- pre release and build metadata parts can not be modified
+Both, Version4 and SemVersion objects now support json serialization and yaml serialization.
+
+```python
+import json
+import yaml
+from semver4 import Version
+from semver4.yaml import get_version4_dumper, get_version4_loader
+
+
+data = {
+    'version': Version('1.2.3.4-beta')
+}
+dumped = json.dumps(data, default=Version.json_enc)
+print(dumped)
+# '{"version": "1.2.3.4-beta"}'
+print(json.loads(dumped, object_hook=Version.json_dec))
+# {"version": 1.2.3.4-beta}
+
+dumped = yaml.dump(data, Dumper=get_version4_dumper())
+print(dumped)
+# version: 1.2.3.4-beta
+print(yaml.load(dumped, Loader=get_version4_loader()))
+# {'version': 1.2.3.4-beta}
+```
+The [PyYAML module](https://pypi.org/project/PyYAML) is not installed with the package because it is required by only one specific feature of the semver4 package which makes it redundant in most of use cases. This also the reason the dumper and the loader are placed in dedicated module.
+
+Installation of PyYAML:
+```bash
+python3 -m pip install PyYAML
+# or python or py or whatever alias you have set
+# add --user for installation to the user dir
+```
