@@ -26,6 +26,9 @@ class BaseVersion:
     def json_decode_function(cls, dct):
         return {k: cls(v) if isinstance(v, str) and cls.validate(v) else v for k, v in dct.items()}
 
+    json_enc = json_encode_function
+    json_dec = json_decode_function
+
     @classmethod
     def get_valid_version_regex(cls):
         return f'^{cls._valid_base_version_regex}(?:-{cls._valid_prerelease_regex})?(?:\+{cls._valid_build_regex})?$'
@@ -189,7 +192,7 @@ class BaseVersion:
         return self.version
 
     def __repr__(self):
-        return f'type {self.__class__.__name__}|{self.version}'
+        return str(self)
 
     def __iter__(self):
         for part, value in self._versionparts.items():

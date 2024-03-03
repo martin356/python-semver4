@@ -80,7 +80,7 @@ class Version4InitTestCase(BaseInitTestCase):
         self.assertEqual({'major': 4, 'minor': 2, 'patch': 0, 'fix': 0, 'prerelease': 'alpha', 'build': '123'}, dict(version))
 
     def test_repr(self):
-        self.assertEqual('type Version4|2.3.6.9', Version4('2.3.6.9').__repr__())
+        self.assertEqual('2.3.6.9', Version4('2.3.6.9').__repr__())
 
     def test_to_string(self):
         self.assertEqual('1.2.3', Version4('1.2.3.0').version)
@@ -111,7 +111,7 @@ class SemVersionInitTestCase(BaseInitTestCase):
         self.assertEqual({'major': 4, 'minor': 2, 'patch': 0, 'prerelease': 'alpha', 'build': '123'}, dict(version))
 
     def test_repr(self):
-        self.assertEqual('type SemVersion|2.3.6', SemVersion('2.3.6').__repr__())
+        self.assertEqual('2.3.6', SemVersion('2.3.6').__repr__())
 
     def test_to_string(self):
         versions = ['1.2.3', '1.2.3-pre', '1.2.3-pre+build']
