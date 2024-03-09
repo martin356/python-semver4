@@ -12,7 +12,8 @@ from semver4.errors import (
 
 class BaseVersion:
 
-    _valid_base_version_regex = None
+    _version_core_parts = []
+    _valid_version_core_regex = None
     _valid_prerelease_regex = '(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)'
     _valid_build_regex = '(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)'
 
@@ -31,7 +32,7 @@ class BaseVersion:
 
     @classmethod
     def get_valid_version_regex(cls):
-        return f'^{cls._valid_base_version_regex}(?:-{cls._valid_prerelease_regex})?(?:\+{cls._valid_build_regex})?$'
+        return f'^{cls._valid_version_core_regex}(?:-{cls._valid_prerelease_regex})?(?:\+{cls._valid_build_regex})?$'
 
     @classmethod
     def validate(cls, version, raise_err=False):
@@ -82,6 +83,10 @@ class BaseVersion:
             raise err
         else:
             self._versionparts = versionparts
+
+    @property
+    def core(self) -> str:
+        return '.'.join([str(self._versionparts[p]) for p in self._version_core_parts])
 
     @property
     def major(self) -> int:
@@ -140,6 +145,9 @@ class BaseVersion:
             raise InvalidVersionPartError(f'Invalid value of version part: ({value})')
 
     def _inc_dec_version_part(self, part: str, op: 'operator') -> BaseVersion:
+        for p in self._version_core_parts:
+            if p > part:
+                self._versionparts[p] = 0
         self._versionparts[part] = op(self._versionparts[part], 1)
         return self
 

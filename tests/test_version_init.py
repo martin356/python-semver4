@@ -11,28 +11,17 @@ class BaseInitTestCase(BaseTestCase):
     def test_from_version_type(self):
         from_version = self.versioncls(major=4, minor=2, patch=0)
         new_version = self.versioncls(version=from_version)
-        self.assertEqual(from_version.major, new_version.major)
-        self.assertEqual(from_version.minor, new_version.minor)
-        self.assertEqual(from_version.patch, new_version.patch)
-        self.assert_for_version4(lambda: self.assertEqual(from_version.fix, new_version.fix))
+        self.assertEqual(str(from_version), str(new_version))
 
     def test_from_str_mandatory_parts(self):
+        test_version = '4.2.0'
         version = self.versioncls(version='4.2.0')
-        self.assertEqual(version.major, 4)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 0)
-        self.assert_for_version4(lambda: self.assertEqual(version.fix, 0))
-        self.assertIsNone(version.prerelease)
-        self.assertIsNone(version.build)
+        self.assertEqual(test_version, str(version))
 
     def test_from_str_without_fix(self):
-        version = self.versioncls(version='4.2.0-alpha.9+989898')
-        self.assertEqual(version.major, 4)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 0)
-        self.assert_for_version4(lambda: self.assertEqual(version.fix, 0))
-        self.assertEqual(version.prerelease, 'alpha.9')
-        self.assertEqual(version.build, '989898')
+        test_version = '4.2.0-alpha.9+989898'
+        version = self.versioncls(version=test_version)
+        self.assertEqual(test_version, str(version))
 
     def test_from_str_wrong_format(self):
         self.assertRaises(InvalidVersionError, self.versioncls, major=4, minor=-1, patch=0)
@@ -58,22 +47,29 @@ class Version4InitTestCase(BaseInitTestCase):
     versioncls = Version4
 
     def test_from_str_with_fix(self):
-        version = Version4(version='4.2.0.9-alpha-beta.9+989898')
-        self.assertEqual(version.major, 4)
-        self.assertEqual(version.minor, 2)
-        self.assertEqual(version.patch, 0)
-        self.assertEqual(version.fix, 9)
-        self.assertEqual(version.prerelease, 'alpha-beta.9')
-        self.assertEqual(version.build, '989898')
+        test_version = '4.2.0.9-alpha-beta.9+989898'
+        version = Version4(version=test_version)
+        self.assertEqual(test_version, str(version))
 
     def test_from_keywords(self):
         version = Version4(major=4, minor='2', patch='0', fix=9, prerelease='alpha.5', build='989529')
+        self.assertEqual('4.2.0.9-alpha.5+989529', str(version))
+
+    def test_fix_default_value_is_zero(self):
+        test_version = '4.2.0-alpha-beta.9+989898'
+        version = Version4(version=test_version)
+        self.assertEqual(test_version, str(version))
+        self.assertEqual(0, version.fix)
+
+    def test_properties(self):
+        version = self.versioncls(version='4.2.0.6-alpha.9+989898')
         self.assertEqual(version.major, 4)
         self.assertEqual(version.minor, 2)
         self.assertEqual(version.patch, 0)
-        self.assertEqual(version.fix, 9)
-        self.assertEqual(version.prerelease, 'alpha.5')
-        self.assertEqual(version.build, '989529')
+        self.assertEqual(version.fix, 6)
+        self.assertEqual(version.prerelease, 'alpha.9')
+        self.assertEqual(version.build, '989898')
+        self.assertEqual(version.core, '4.2.0.6')
 
     def test_iterator(self):
         version = Version4(major=4, minor='2', patch='0', prerelease='alpha', build='123')
@@ -99,12 +95,17 @@ class SemVersionInitTestCase(BaseInitTestCase):
 
     def test_from_keywords(self):
         version = SemVersion(major=4, minor='2', patch='0', prerelease='alpha.5', build='989529')
+        self.assertEqual('4.2.0-alpha.5+989529', str(version))
+
+    def test_properties(self):
+        version = self.versioncls(version='4.2.0-alpha.9+989898')
         self.assertEqual(version.major, 4)
         self.assertEqual(version.minor, 2)
         self.assertEqual(version.patch, 0)
         self.assertRaises(FixPartNotSupported, lambda: version.fix)
-        self.assertEqual(version.prerelease, 'alpha.5')
-        self.assertEqual(version.build, '989529')
+        self.assertEqual(version.prerelease, 'alpha.9')
+        self.assertEqual(version.build, '989898')
+        self.assertEqual(version.core, '4.2.0')
 
     def test_iterator(self):
         version = SemVersion(major=4, minor='2', patch='0', prerelease='alpha', build='123')
