@@ -4,23 +4,30 @@ from semver4.baseversion import BaseVersion
 from semver4.errors import FixPartNotSupported
 
 
-__version__ = '0.0.1-beta.5'
+__version__ = '0.0.1-beta.6'
 
 
 class Version4(BaseVersion):
 
-    # _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
-    _valid_base_version_regex = '(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?'
+    _valid_version_core_regex = '(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:\.(?P<fix>0|[1-9]\d*))?'
+    _version_core_parts = ['major', 'minor', 'patch', 'fix']
 
     def _build_version(self, **parts):
         ma, mi, pa, fx, pre, bl = parts['major'], parts['minor'], parts['patch'], parts['fix'], parts['prerelease'], parts['build']
         return f'{ma}.{mi}.{pa}{f".{fx}" if fx else ""}{f"-{pre}" if pre else ""}{f"+{bl}" if bl else ""}'
 
+    def _inc_dec_version_part(self, part: str, op: 'operator') -> BaseVersion:
+        if part == 'fix':
+            self._versionparts['fix'] = op(self._versionparts[part], 1)
+            return self
+        self._versionparts['fix'] = 0
+        return super()._inc_dec_version_part(part, op)
+
 
 class SemVersion(BaseVersion):
 
-    # _valid_version_regex = '^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
-    _valid_base_version_regex = '(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)'
+    _valid_version_core_regex = '(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)'
+    _version_core_parts = ['major', 'minor', 'patch']
 
     def __init__(
             self,

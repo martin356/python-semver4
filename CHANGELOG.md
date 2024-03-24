@@ -1,3 +1,8 @@
+## 0.0.1-beta.5 (0.0.1b6)
+- #### Added
+    - core property: return core of a version
+- #### Fixed
+    - increase and decrease a version part
 ## 0.0.1-beta.5 (0.0.1b5)
 - #### Added
     - comparison of pre-release part of a version
