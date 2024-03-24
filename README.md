@@ -31,27 +31,46 @@ Few samples how to use the module. There are tow classes:
 from semver4 import Version
 
 
-version = Version(major=2, minor=4, patch=4, prerelease='beta')
+version = Version4('2.4.4.0-alpha+123')
 print(version)
-# '2.4.4-beta'
-print(version.minor)
-# 4
+# '2.4.4-alpha+123'
+
+version = Version4(major=2, minor=4, patch=4, prerelease='beta', build='12346')
+print(version)
+# '2.4.4-beta+12346'
+print(version.minor, version.fix)
+# 4 0
+print(version.core)
+# '2.4.4'
 
 print(version > Version('0.4.2.4'))
 # True
+print(version == '2.4.4-beta+12346')
+# True
+print(version == 'blabla')
+# raises NotComparableError
 
 version.inc_fix()
 print(version)
-# '2.4.4.1-beta'
+# '2.4.4.1'
 print(version.fix)
 # 1
 
-version.inc_minor().inc_major().dec_patch()
+version.prerelease = 'rc'
+version.metadata = '987'
 print(version)
-# '3.5.3.1-beta'
+# '2.4.4.1-rc+987'
+print(version.core)
+# '2.4.4.1'
+
+version.inc_minor().inc_major().inc_patch()
+print(version)
+# '3.0.1'
 
 # classic semver2.0 parser
-v = SemVersion('1.2.3')
+v = SemVersion('1.2.3-alpha+007')
+print(v)
+# '1.2.3-alpha+007'
 ```
 
 Both, Version4 and SemVersion objects now support json serialization and yaml serialization.

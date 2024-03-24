@@ -86,7 +86,7 @@ class BaseVersion:
 
     @property
     def core(self) -> str:
-        return '.'.join([str(self._versionparts[p]) for p in self._version_core_parts])
+        return '.'.join([str(self._versionparts[p]) for p in self._version_core_parts if self._versionparts[p] or p != 'fix'])
 
     @property
     def major(self) -> int:
@@ -149,6 +149,8 @@ class BaseVersion:
             if p > part:
                 self._versionparts[p] = 0
         self._versionparts[part] = op(self._versionparts[part], 1)
+        self._versionparts['prerelease'] = None
+        self._versionparts['build'] = None
         return self
 
     def inc(self, part: str) -> BaseVersion:
@@ -189,7 +191,9 @@ class BaseVersion:
         return matched
 
     def _compare(self, obj: BaseVersion, op: 'operator', can_equal: bool) -> bool:
-        if not isinstance(obj, BaseVersion):
+        if isinstance(obj, str) and self.validate(obj):
+            obj = self.__class__(obj)
+        elif not isinstance(obj, BaseVersion):
             raise NotComparableError(f'Can not compare Version type and {type(obj)}')
         for versionpart in self._versionparts:
             if versionpart != 'build' and self[versionpart] != obj[versionpart]:

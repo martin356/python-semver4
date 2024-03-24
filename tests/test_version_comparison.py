@@ -1,6 +1,6 @@
 import unittest
 from semver4.errors import NotComparableError
-from semver4 import BaseVersion, SemVersion, Version4
+from semver4 import SemVersion, Version4
 
 
 class BaseVersionCompareTestCase(unittest.TestCase):
@@ -26,6 +26,10 @@ class BaseVersionCompareTestCase(unittest.TestCase):
     def test_dont_compare_buildmetadata(self):
         self.assertTrue(self.versioncls('1.2.3-alpha.5+1') == self.versioncls('1.2.3-alpha.5+9'))
         self.assertFalse(self.versioncls('1.2.3-alpha.5+1') != self.versioncls('1.2.3-alpha.5+9'))
+
+    def test_comparable_to_string(self):
+        self.assertEqual(self.versioncls('1.2.3'), '1.2.3')
+        self.assertRaises(NotComparableError, lambda: self.versioncls('1.2.3') == 'bla.blu.bli')
 
 
 class Version4ComparisonTestCase(BaseVersionCompareTestCase):

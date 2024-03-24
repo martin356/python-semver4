@@ -19,6 +19,8 @@ class Version4(BaseVersion):
     def _inc_dec_version_part(self, part: str, op: 'operator') -> BaseVersion:
         if part == 'fix':
             self._versionparts['fix'] = op(self._versionparts[part], 1)
+            self._versionparts['prerelease'] = None
+            self._versionparts['build'] = None
             return self
         self._versionparts['fix'] = 0
         return super()._inc_dec_version_part(part, op)

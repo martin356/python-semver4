@@ -69,7 +69,11 @@ class Version4InitTestCase(BaseInitTestCase):
         self.assertEqual(version.fix, 6)
         self.assertEqual(version.prerelease, 'alpha.9')
         self.assertEqual(version.build, '989898')
-        self.assertEqual(version.core, '4.2.0.6')
+
+    def test_property__core(self):
+        for version, core in [('4.2.0.6-alpha+9', '4.2.0.6'), ('4.2.0-alpha+98', '4.2.0')]:
+            v = Version4(version=version)
+            self.assertEqual(core, v.core)
 
     def test_iterator(self):
         version = Version4(major=4, minor='2', patch='0', prerelease='alpha', build='123')
