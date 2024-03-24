@@ -86,7 +86,7 @@ class UpdateVersion4PartTestCase(BaseUpdateVersionPartTestCase):
     versioncls = Version4
 
     def setUp(self):
-        self.version = Version4('1.2.3.4')
+        self.version = Version4('1.2.3.4-alpha.2+123456')
 
     def test_chaining(self):
         v = self.version.inc_major().inc_patch().dec_patch().inc_major().inc_fix()
@@ -116,7 +116,7 @@ class UpdateSemVersionPartTestCase(BaseUpdateVersionPartTestCase):
     versioncls = SemVersion
 
     def setUp(self):
-        self.version = SemVersion('1.2.3')
+        self.version = SemVersion('1.2.3-alpha.2+123456')
 
     def test_chaining(self):
         v = self.version.dec_minor().inc_major().inc_patch().inc_minor().inc_patch()

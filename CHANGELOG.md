@@ -1,4 +1,10 @@
-## 0.0.1-beta.5 (0.0.1b6)
+## 0.0.1-beta.7 (0.0.1b7)
+- #### Added
+    - make Version object comparable to string
+- #### Fixed
+    - core property: fix version is ignored if equals to 0
+    - increase and decrease a version part: prerelase and build metadata are cut
+## 0.0.1-beta.6 (0.0.1b6)
 - #### Added
     - core property: return core of a version
 - #### Fixed

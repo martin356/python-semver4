@@ -4,7 +4,7 @@ from semver4.baseversion import BaseVersion
 from semver4.errors import FixPartNotSupported
 
 
-__version__ = '0.0.1-beta.6'
+__version__ = '0.0.1-beta.7'
 
 
 class Version4(BaseVersion):
@@ -19,6 +19,8 @@ class Version4(BaseVersion):
     def _inc_dec_version_part(self, part: str, op: 'operator') -> BaseVersion:
         if part == 'fix':
             self._versionparts['fix'] = op(self._versionparts[part], 1)
+            self._versionparts['prerelease'] = None
+            self._versionparts['build'] = None
             return self
         self._versionparts['fix'] = 0
         return super()._inc_dec_version_part(part, op)
