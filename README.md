@@ -11,8 +11,8 @@ However, sometimes we need to distinguish two types of a bugfix.
 
 The first type is released in a standard release process and at the end the patch of a version is increased.
 
-The second one is the case we identified a bug which has to be fixed and released immidiately. In this case, a version witch increased patch can potentially already exists as any sort of pre-release version.
-<br>Let's assume there is version *0.4.2* deployed in production. Versions *0.4.3-rc* and *0.4.4-rc* already exist in our non prod environment but they are not ready to be released. The question is what version should have fixed code. If we want to increase patch we would have to jump to *0.4.5* which may (and will) brings confusion in the versioning.
+The second one is the case when we identified a bug which has to be fixed and released immidiately. In this case the version increased patch can potentially already exists as any sort of pre-release version.
+<br>Let's assume there is version *0.4.2* deployed in production. Versions *0.4.3-rc* and *0.4.4-rc* already exist in our non prod environment but they are not ready to be released. So, what should be the version of the hotfix? If we want to increase patch we would have to jump to *0.4.5* which may (and will) brings confusion in the versioning.
 
 ### Fix version part
 To solve to the scenario described above, we introduce 4th number to main version part. Let's call it fix version and define it as:
